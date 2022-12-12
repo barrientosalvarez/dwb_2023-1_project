@@ -6,10 +6,10 @@ spring:
     config:
       server: 
         git:
-          uri: https://ivan_saavedra@bitbucket.org/ivan_saavedra/dwb2023-1_config-data.git
-          search-paths: api
+          uri: https://github.com/barrientosalvarez/dwb_2023-1_project
+          search-paths: config-data/api
 
-          default-label: "master"
+          default-label: "main"
           
   security:
     user:
