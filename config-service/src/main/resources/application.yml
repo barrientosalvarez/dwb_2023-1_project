@@ -1,16 +1,16 @@
 server:
   port: 8888
-
+  
 spring:
   cloud:
     config:
-      server:
+      server: 
         git:
           uri: https://github.com/barrientosalvarez/dwb_2023-1_project
           search-paths: config-data/api
 
           default-label: "main"
-
+          
   security:
     user:
       name: root
