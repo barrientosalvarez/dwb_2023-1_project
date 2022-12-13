@@ -14,9 +14,9 @@
 	<name>customer</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>11</java.version>
+        <java.version>11</java.version>
         <spring-boot-admin.version>2.7.4</spring-boot-admin.version>
-		<spring-cloud.version>2021.0.1</spring-cloud.version>
+        <spring-cloud.version>2021.0.1</spring-cloud.version>
 	</properties>
 	<dependencies>
 		<dependency>
