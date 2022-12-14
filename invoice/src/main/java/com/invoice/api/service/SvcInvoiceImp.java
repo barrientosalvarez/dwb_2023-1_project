@@ -2,18 +2,20 @@ package com.invoice.api.service;
 
 import java.util.List;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter; 
-
+import java.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.invoice.api.dto.ApiResponse;
+import com.invoice.api.dto.DtoProduct;
+import com.invoice.exception.ApiException;
 import com.invoice.api.entity.Invoice;
 import com.invoice.api.entity.Item;
 import com.invoice.api.entity.Cart;
 import com.invoice.api.repository.RepoInvoice;
 import com.invoice.api.repository.RepoItem;
+import com.invoice.api.repository.RepoCart;
 import com.invoice.configuration.client.ProductClient;
+import org.springframework.http.HttpStatus;
 
 @Service
 public class SvcInvoiceImp implements SvcInvoice {
@@ -27,7 +29,7 @@ public class SvcInvoiceImp implements SvcInvoice {
     @Autowired
     RepoCart repoCart;
 
-    @AutoWired
+    @Autowired
     ProductClient productCl;
 
 	@Override
@@ -53,21 +55,21 @@ public class SvcInvoiceImp implements SvcInvoice {
             throw new ApiException(HttpStatus.NOT_FOUND, "cart not found");
 
         Integer id=0;
-        List<Invoice> invoice = repo.getInvoice();
+        List<Invoice> invoices = repo.getInvoice();
 
-        for(Invoice inv : invoice){
+        for(Invoice inv : invoices){
             if(inv.getInvoice_id()>id)
                 id=inv.getInvoice_id();
         }
 
         for(Cart cart : carts){            
-            Integer price=productCl.getProduct(cart.getGtin()).getPrice();
+            double price=productCl.getProduct(cart.getGtin()).getBody().getPrice();
             
             Item item = new Item();
             item.setId_invoice(id);
             item.setGtin(cart.getGtin());
             item.setQuantity(cart.getQuantity());
-            item.setUnit_price(productCl.getProduct(cart.getGtin()).getPrice());
+            item.setUnit_price(productCl.getProduct(cart.getGtin()).getBody().getPrice());
             item.setSubtotal(item.getUnit_price()*item.getQuantity());
             item.setTaxes(item.getSubtotal()*0.16);
             item.setTotal(item.getSubtotal()+(item.getSubtotal()*0.16));
@@ -76,12 +78,12 @@ public class SvcInvoiceImp implements SvcInvoice {
         }
 
         Invoice invoice=new Invoice();
-        invoice.setRfc(invoice);
-        Integer subtotal=0;
-        Integer total=0;
-        Integer taxes=0;
+        invoice.setRfc(rfc);
+        double subtotal=0;
+        double total=0;
+        double taxes=0;
 
-        List<Item> items=repoItems.getInvoiceItems(id);
+        List<Item> items=repoItem.getInvoiceItems(id);
         for(Item item : items){
             subtotal+=item.getSubtotal();
             total+=item.getTotal();
@@ -91,9 +93,9 @@ public class SvcInvoiceImp implements SvcInvoice {
         invoice.setSubtotal(subtotal);
         invoice.setTaxes(taxes);
         invoice.setTotal(total);
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");  
-        LocalDateTime now = LocalDateTime.now();  
-        invoice.setDate(now);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime now = LocalDateTime.now();
+        invoice.setCreated_at(now);
         repoCart.clearCart(rfc);
         return new ApiResponse("invoice generated");
 	}
