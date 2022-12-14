@@ -9,7 +9,7 @@ public class DtoProduct {
 
     private Integer stock;
 
-    private Integer price;
+    private double price;
 
     public String getGtin(){
         return this.gtin;
@@ -19,7 +19,7 @@ public class DtoProduct {
         return this.stock;
     }
 
-    public Integer getPrice(){
+    public double getPrice(){
         return this.price;
     }
 
