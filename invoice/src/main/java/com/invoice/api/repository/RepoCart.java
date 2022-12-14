@@ -25,8 +25,8 @@ public interface RepoCart extends JpaRepository<Cart, Integer>{
 
     // Implementacion de la firma de un método que nos permite consultar un carro por su ID
     // Usado para el punto 4
-    @Query(value="SELECT * FROM cart WHERE cart_id=:cart_id AND status=1", nativeQuery=true)
-    Cart getCartById(@Param("cart_id") Integer cart_id);
+    @Query(value="SELECT * FROM cart WHERE rfc=:rfc AND gtin=:gtin AND status=1", nativeQuery=true)
+    Cart findByRfcAndGtin(@Param("rfc") String rfc, @Param("gtin") String gtin);
 
 
 	@Modifying

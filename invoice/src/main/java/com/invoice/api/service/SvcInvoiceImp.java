@@ -63,6 +63,9 @@ public class SvcInvoiceImp implements SvcInvoice {
         }
 
         for(Cart cart : carts){            
+            if(cart.getQuantity()<1)
+                throw new ApiException(HttpStatus.NOT_FOUND, "cart has no items");
+
             double price=productCl.getProduct(cart.getGtin()).getBody().getPrice();
             
             Item item = new Item();
