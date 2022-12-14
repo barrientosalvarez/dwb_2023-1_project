@@ -55,21 +55,21 @@ public class SvcInvoiceImp implements SvcInvoice {
             throw new ApiException(HttpStatus.NOT_FOUND, "cart not found");
 
         Integer id=0;
-        List<Invoice> invoice = repo.getInvoice();
+        List<Invoice> invoices = repo.getInvoice();
 
-        for(Invoice inv : invoice){
+        for(Invoice inv : invoices){
             if(inv.getInvoice_id()>id)
                 id=inv.getInvoice_id();
         }
 
         for(Cart cart : carts){            
-            Integer price=productCl.getProduct(cart.getGtin()).getBody().getPrice();
+            double price=productCl.getProduct(cart.getGtin()).getBody().getPrice();
             
             Item item = new Item();
             item.setId_invoice(id);
             item.setGtin(cart.getGtin());
             item.setQuantity(cart.getQuantity());
-            item.setUnit_price(double (productCl.getProduct(cart.getGtin()).getBody().getPrice()));
+            item.setUnit_price(productCl.getProduct(cart.getGtin()).getBody().getPrice());
             item.setSubtotal(item.getUnit_price()*item.getQuantity());
             item.setTaxes(item.getSubtotal()*0.16);
             item.setTotal(item.getSubtotal()+(item.getSubtotal()*0.16));
@@ -78,12 +78,12 @@ public class SvcInvoiceImp implements SvcInvoice {
         }
 
         Invoice invoice=new Invoice();
-        invoice.setRfc(invoice);
-        Integer subtotal=0;
-        Integer total=0;
-        Integer taxes=0;
+        invoice.setRfc(rfc);
+        double subtotal=0;
+        double total=0;
+        double taxes=0;
 
-        List<Item> items=repoItems.getInvoiceItems(id);
+        List<Item> items=repoItem.getInvoiceItems(id);
         for(Item item : items){
             subtotal+=item.getSubtotal();
             total+=item.getTotal();
@@ -95,7 +95,7 @@ public class SvcInvoiceImp implements SvcInvoice {
         invoice.setTotal(total);
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime now = LocalDateTime.now();
-        invoice.setDate(now);
+        invoice.setCreated_at(now);
         repoCart.clearCart(rfc);
         return new ApiResponse("invoice generated");
 	}
