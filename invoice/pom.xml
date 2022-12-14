@@ -71,9 +71,10 @@
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactID>spring-cloud-starter-feign<artifactId>
-            <version>1.4.7 RELEASE </version>
+            <artifactId>spring-cloud-starter-feign</artifactId>
+            <version>1.4.7.RELEASE</version>
         </dependency>
+
 		<dependency>
 			<groupId>de.codecentric</groupId>
 			<artifactId>spring-boot-admin-starter-client</artifactId>

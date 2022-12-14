@@ -2,18 +2,20 @@ package com.invoice.api.service;
 
 import java.util.List;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter; 
-
+import java.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.invoice.api.dto.ApiResponse;
+import com.invoice.api.dto.DtoProduct;
+import com.invoice.exception.ApiException;
 import com.invoice.api.entity.Invoice;
 import com.invoice.api.entity.Item;
 import com.invoice.api.entity.Cart;
 import com.invoice.api.repository.RepoInvoice;
 import com.invoice.api.repository.RepoItem;
+import com.invoice.api.repository.RepoCart;
 import com.invoice.configuration.client.ProductClient;
+import org.springframework.http.HttpStatus;
 
 @Service
 public class SvcInvoiceImp implements SvcInvoice {
@@ -27,7 +29,7 @@ public class SvcInvoiceImp implements SvcInvoice {
     @Autowired
     RepoCart repoCart;
 
-    @AutoWired
+    @Autowired
     ProductClient productCl;
 
 	@Override
@@ -91,8 +93,8 @@ public class SvcInvoiceImp implements SvcInvoice {
         invoice.setSubtotal(subtotal);
         invoice.setTaxes(taxes);
         invoice.setTotal(total);
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");  
-        LocalDateTime now = LocalDateTime.now();  
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime now = LocalDateTime.now();
         invoice.setDate(now);
         repoCart.clearCart(rfc);
         return new ApiResponse("invoice generated");
