@@ -12,6 +12,7 @@ import com.invoice.api.dto.DtoCustomer;
 import com.invoice.api.entity.Cart;
 import com.invoice.api.repository.RepoCart;
 import com.invoice.configuration.client.CustomerClient;
+import con.invoice.configuration.client.ProductClient;
 import com.invoice.exception.ApiException;
 
 @Service
@@ -22,6 +23,9 @@ public class SvcCartImp implements SvcCart {
 	
 	@Autowired
 	CustomerClient customerCl;
+
+    @Autowired
+    ProductClient productCl;
 	
 	@Override
 	public List<Cart> getCart(String rfc) {
@@ -32,12 +36,16 @@ public class SvcCartImp implements SvcCart {
 	public ApiResponse addToCart(Cart cart) {
 		if(!validateCustomer(cart.getRfc()))
 			throw new ApiException(HttpStatus.BAD_REQUEST, "customer does not exist");
+
 			
 		/*
 		 * Requerimiento 3
 		 * Validar que el GTIN exista. Si existe, asignar el stock del producto a la variable product_stock 
 		 */
-		Integer product_stock = 0; // cambiar el valor de cero por el stock del producto recuperado de la API Product 
+        if(!validateProduct(cart.getGtin()))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "product does not exist");
+
+		Integer product_stock = productCl.getProduct(cart.getGtin()).getStock(); // cambiar el valor de cero por el stock del producto recuperado de la API Product 
 		
 		if(cart.getQuantity() > product_stock) {
 			throw new ApiException(HttpStatus.BAD_REQUEST, "invalid quantity");
@@ -47,11 +55,44 @@ public class SvcCartImp implements SvcCart {
 		 * Requerimiento 4
 		 * Validar si el producto ya había sido agregado al carrito para solo actualizar su cantidad
 		 */
-		
+
+        if(repo.findCartById(cart.getCart_id(cart.getCart_id))!=null){
+            Cart oldCart=repo.findCartById(cart.getCart_id);
+
+            if((oldCart.getQuantity()+cart.getQuantity())>product_stock)
+                throw new ApiException(HttpStatus.BAD_REQUEST, "invalid quantity");
+
+            else{
+                newStock=product_stock-(oldCart.getQuantity()+cart.getQuantity());
+                productCl.updateProductStock(cart.getGtin(), newStock);
+                return new ApiResponse("quantity updated");
+            }
+        }
+
 		cart.setStatus(1);
 		repo.save(cart);
+
 		return new ApiResponse("item added");
 	}
+
+    /**
+     * Metodo auxiliar para el requerimiento 3: valida que un gtin exista.
+     * @param gtin el gtin que se buscará validar.
+     * @return <code>true</code> si el gtin fue validado, <code>false</code> en 
+     * otro caso.
+     */
+    private boolean validateGtin(String gtin){
+        try{
+            ResponseEntity<DtoProduct> response = productCl.getProduct(gtin);
+            if(response.getStatusCode()==HttpStatus.OK)
+                return true;
+
+            else 
+                return false;
+        }catch(Exceotion e){
+            throw new ApiException(HttpStatus.BAD_REQUEST, "unable to retrieve product information");
+        }
+    }
 
 	@Override
 	public ApiResponse removeFromCart(Integer cart_id) {
