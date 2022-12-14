@@ -94,6 +94,7 @@ public class SvcInvoiceImp implements SvcInvoice {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");  
         LocalDateTime now = LocalDateTime.now();  
         invoice.setDate(now);
+        repoCart.clearCart(rfc);
         return new ApiResponse("invoice generated");
 	}
 
