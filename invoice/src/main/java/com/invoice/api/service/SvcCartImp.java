@@ -47,7 +47,7 @@ public class SvcCartImp implements SvcCart {
             throw new ApiException(HttpStatus.BAD_REQUEST, "product does not exist");
 
         ResponseEntity<DtoProduct> product = productCl.getProduct(cart.getGtin());
-        Integer product_stock = product.getBody().getPrice(); // cambiar el valor de cero por el stock del producto recuperado de la API Product 
+        Integer product_stock = product.getBody().getStock(); // cambiar el valor de cero por el stock del producto recuperado de la API Product 
 		
 		if(cart.getQuantity() > product_stock) {
 			throw new ApiException(HttpStatus.BAD_REQUEST, "invalid quantity");
