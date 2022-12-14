@@ -63,13 +63,13 @@ public class SvcInvoiceImp implements SvcInvoice {
         }
 
         for(Cart cart : carts){            
-            Integer price=productCl.getProduct(cart.getGtin()).getPrice();
+            Integer price=productCl.getProduct(cart.getGtin()).getBody().getPrice();
             
             Item item = new Item();
             item.setId_invoice(id);
             item.setGtin(cart.getGtin());
             item.setQuantity(cart.getQuantity());
-            item.setUnit_price(productCl.getProduct(cart.getGtin()).getPrice());
+            item.setUnit_price(double (productCl.getProduct(cart.getGtin()).getBody().getPrice()));
             item.setSubtotal(item.getUnit_price()*item.getQuantity());
             item.setTaxes(item.getSubtotal()*0.16);
             item.setTotal(item.getSubtotal()+(item.getSubtotal()*0.16));
